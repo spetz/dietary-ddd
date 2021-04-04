@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Dietary.Models
 {
@@ -9,7 +10,9 @@ namespace Dietary.Models
         public OrderType Type { get; set; }
         public long CustomerOrderGroupId { get; set; }
         public CustomerOrderGroup CustomerOrderGroup { get; set; }
+        public List<OrderLine> Items { get; set; }
         public DateTime? ConfirmationTimestamp { get; set; }
+        public List<TaxRule> TaxRules { get; set; }
         
         public enum OrderState
         {

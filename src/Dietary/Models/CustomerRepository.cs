@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Dietary.DAL;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,8 @@ namespace Dietary.Models
     {
         Task<Customer> FindByIdAsync(long id);
         Task<Customer> FindByNameAsync(string name);
+        Task SaveAsync(Customer customer);
+        Task DeleteAsync(Customer customer);
     }
 
     public class CustomerRepository : ICustomerRepository
@@ -23,15 +26,22 @@ namespace Dietary.Models
         }
 
         public Task<Customer> FindByIdAsync(long id)
-            => _customers
-                .Include(x => x.Group)
-                .ThenInclude(x => x.Orders)
+            => Query()
                 .SingleOrDefaultAsync(x => x.Id == id);
 
         public Task<Customer> FindByNameAsync(string name)
+            => Query()
+                .SingleOrDefaultAsync(x => x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+
+        private IQueryable<Customer> Query()
             => _customers
                 .Include(x => x.Group)
                 .ThenInclude(x => x.Orders)
-                .SingleOrDefaultAsync(x => x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+                .ThenInclude(x => x.TaxRules)
+                .ThenInclude(x => x.TaxConfig);
+        
+        public Task SaveAsync(Customer customer) => _dbContext.UpsertAsync(customer);
+        
+        public Task DeleteAsync(Customer customer) => _dbContext.DeleteAsync(customer);
     }
 }

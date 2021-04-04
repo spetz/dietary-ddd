@@ -10,6 +10,8 @@ namespace Dietary.DAL.Mappings
         {
             builder.HasKey(x => x.Id);
             builder.HasOne(x => x.CustomerOrderGroup);
+            builder.HasMany(x => x.Items);
+            builder.HasMany(x => x.TaxRules);
         }
     }
 }

@@ -107,6 +107,11 @@ namespace Dietary.Models
             var c = await _customerRepository.FindByNameAsync(authentication);
             if (includingSubordinates)
             {
+                if (!c.Type.Equals(Customer.CustomerType.Company) && !c.Type.Equals(Customer.CustomerType.Division))
+                {
+                    throw new InvalidOperationException("not a company nor division");
+                }
+
                 return await GetOrdersIncludingSubordinatesAsync(c.Id);
             }
             else

@@ -7,6 +7,8 @@ namespace Dietary.Models
     public interface ICustomerOrderGroupRepository
     {
         Task<CustomerOrderGroup> FindByIdAsync(long id);
+        Task SaveAsync(CustomerOrderGroup customerOrderGroup);
+        Task DeleteAsync(CustomerOrderGroup customerOrderGroup);
     }
     
     public class CustomerOrderGroupRepository : ICustomerOrderGroupRepository
@@ -24,6 +26,12 @@ namespace Dietary.Models
             => _groups
                 .Include(x => x.Customer)
                 .Include(x => x.Orders)
+                .ThenInclude(x => x.TaxRules)
+                .ThenInclude(x => x.TaxConfig)
                 .SingleOrDefaultAsync(x => x.Id == id);
+        
+        public Task SaveAsync(CustomerOrderGroup customerOrderGroup) => _dbContext.UpsertAsync(customerOrderGroup);
+        
+        public Task DeleteAsync(CustomerOrderGroup customerOrderGroup) => _dbContext.DeleteAsync(customerOrderGroup);
     }
 }

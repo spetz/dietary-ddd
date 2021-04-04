@@ -16,10 +16,13 @@ namespace Dietary
             services
                 .AddScoped<CustomerService>()
                 .AddScoped<OrderService>()
+                .AddScoped<TaxRuleService>()
                 .AddScoped<IAuthenticationFacade, AuthenticationFacade>()
                 .AddScoped<ICustomerRepository, CustomerRepository>()
                 .AddScoped<ICustomerOrderGroupRepository, CustomerOrderGroupRepository>()
                 .AddScoped<IOrderRepository, OrderRepository>()
+                .AddScoped<ITaxConfigRepository, TaxConfigRepository>()
+                .AddScoped<ITaxRuleRepository, TaxRuleRepository>()
                 .AddDbContext<DietaryDbContext>(x => x.UseInMemoryDatabase("dietary"))
                 .AddControllers();
         }
