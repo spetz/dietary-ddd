@@ -5,100 +5,131 @@ namespace Dietary.Models.NewProducts
     public class OldProduct
     {
         public Guid SerialNumber { get; private set; } = Guid.NewGuid();
-        public decimal? Price { get; private set; }
-        public string Desc { get; private set; }
-        public string LongDesc { get; private set; }
-        public int? Counter { get; private set; }
+        private Price _price;
+        private Description _desc;
+        private Counter _counter;
 
-        public OldProduct(decimal? price, string desc, string longDesc, int? counter)
+        public OldProduct(decimal? price, string desc, string longDesc, int counter)
         {
-            Price = price;
-            Desc = desc;
-            LongDesc = longDesc;
-            Counter = counter;
+            _price = Price.Of(price);
+            _desc = new Description(desc, longDesc);
+            _counter = new Counter(counter);
         }
 
         public void DecrementCounter()
         {
-            if (Price is not null && Price > 0)
+            if (_price.IsNotZero())
             {
-                if (Counter == null)
-                {
-                    throw new InvalidOperationException("null counter");
-                }
-
-                Counter = Counter - 1;
-                if (Counter < 0)
-                {
-                    throw new InvalidOperationException("Negative counter");
-                }
+                _counter = _counter.Decrement();
             }
             else
             {
-                throw new InvalidOperationException("Invalid price");
+                throw new InvalidOperationException("price is zero");
             }
         }
 
         public void IncrementCounter()
         {
-            if (Price is not null && Price > 0)
+            if (_price.IsNotZero())
             {
-                if (Counter == null)
-                {
-                    throw new InvalidOperationException("null counter");
-                }
-
-                if (Counter + 1 < 0)
-                {
-                    throw new InvalidOperationException("Negative counter");
-                }
-
-                Counter = Counter + 1;
-
+                _counter = _counter.Increment();
             }
             else
             {
-                throw new InvalidOperationException("Invalid price");
+                throw new InvalidOperationException("price is zero");
             }
         }
 
-        public void ChangePriceTo(decimal? newPrice)
+        public void ChangePriceTo(decimal price)
         {
-            if (Counter == null)
+            if (_counter.HasAny())
             {
-                throw new InvalidOperationException("null counter");
-            }
-
-            if (Counter > 0)
-            {
-                if (newPrice == null)
-                {
-                    throw new InvalidOperationException("new price null");
-                }
-
-                Price = newPrice;
+                _price = Price.Of(price);
             }
         }
 
-        public void ReplaceCharFromDesc(string charToReplace, string replaceWith)
+        public void ReplaceCharFromDesc(char charToReplace, char replaceWith)
         {
-            if (string.IsNullOrWhiteSpace(LongDesc) || string.IsNullOrWhiteSpace(Desc))
-            {
-                throw new InvalidOperationException("null or empty desc");
-            }
-
-            LongDesc = LongDesc.Replace(charToReplace, replaceWith);
-            Desc = Desc.Replace(charToReplace, replaceWith);
+            _desc = _desc.Replace(charToReplace, replaceWith);
         }
 
-        public string FormatDesc()
+        public string FormatDesc() => _desc.Formatted();
+
+        public decimal GetPrice() => _price.GetAsDecimal();
+
+        public int GetCounter() => _counter.GetIntValue();
+    }
+
+    public class Price
+    {
+        private readonly decimal? _price;
+
+        public static Price Of(decimal? value) => new Price(value);
+
+        private Price(decimal? price)
         {
-            if (string.IsNullOrWhiteSpace(LongDesc) || string.IsNullOrWhiteSpace(Desc))
+            if (price is null || price < 0)
+            {
+                throw new InvalidOperationException($"Cannot have negative price: {price}");
+            }
+
+            _price = price;
+        }
+
+        public bool IsNotZero() => _price != 0;
+
+        public decimal GetAsDecimal() => _price.Value;
+    }
+
+    public class Description
+    {
+
+        private readonly string _desc;
+        private readonly string _longDesc;
+
+        public Description(string desc, string longDesc)
+        {
+            _desc = desc ?? throw new InvalidOperationException("Cannot have a null description");
+            _longDesc = longDesc ?? throw new InvalidOperationException("Cannot have null long description");
+        }
+
+        public string Formatted()
+        {
+            if (string.IsNullOrWhiteSpace(_desc) || string.IsNullOrWhiteSpace(_longDesc))
             {
                 return "";
             }
 
-            return Desc + " *** " + LongDesc;
+            return $"{_desc} *** {_longDesc}";
         }
+
+        public Description Replace(char charToReplace, char replaceWith)
+            => new Description(_desc.Replace(charToReplace, replaceWith),
+                _longDesc.Replace(charToReplace, replaceWith));
+    }
+
+    public class Counter
+    {
+        private readonly int _counter;
+
+        public static Counter Zero() => new Counter(0);
+
+        public Counter(int counter)
+        {
+            if (counter < 0)
+            {
+                throw new InvalidOperationException($"Cannot have negative counter: {counter}");
+            }
+
+            _counter = counter;
+        }
+
+        public int GetIntValue() => _counter;
+
+        public Counter Increment() => new Counter(_counter + 1);
+
+        public Counter Decrement() => new Counter(_counter - 1);
+
+        public bool HasAny() => _counter > 0;
     }
 }
