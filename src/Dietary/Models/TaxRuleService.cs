@@ -162,6 +162,12 @@ namespace Dietary.Models
             }
         }
 
+        public async Task<List<TaxRule>> FindRulesAsync(string countryCode)
+            => (await _taxConfigRepository.FindByCountryCodeAsync(countryCode)).TaxRules;
+
+        public async Task<int> RulesCountAsync(string countryCode)
+            => (await _taxConfigRepository.FindByCountryCodeAsync(countryCode)).CurrentRulesCount;
+        
         public Task<List<TaxConfig>> FindAllConfigsAsync() => _taxConfigRepository.FindAllAsync();
     }
 }
