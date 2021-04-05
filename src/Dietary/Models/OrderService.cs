@@ -119,5 +119,27 @@ namespace Dietary.Models
                 return await _customerService.GetIndividualOrdersForCustomerAsync(c.Id);
             }
         }
+
+        public async Task<decimal> CalculateTaxForOrderAsync(long orderId)
+        {
+            var order = await _orderRepository.FindByIdAsync(orderId);
+            var initialValue = 0M;
+            foreach (var tax in order.TaxRules)
+            {
+                if (tax.IsLinear)
+                {
+                    initialValue *= tax.AFactor + tax.BFactor;
+                }
+
+                if (tax.IsSquare)
+                {
+                    initialValue = (decimal) Math.Pow((double) initialValue, 2) * tax.ASquareFactor +
+                                   (initialValue * tax.BFactor) +
+                                   tax.CSquareFactor;
+                }
+            }
+
+            return initialValue;
+        }
     }
 }

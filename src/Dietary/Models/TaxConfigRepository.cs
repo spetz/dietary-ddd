@@ -9,6 +9,7 @@ namespace Dietary.Models
 {
     public interface ITaxConfigRepository
     {
+        Task<TaxConfig> FindByIdAsync(long id);
         Task<TaxConfig> FindByCountryCodeAsync(string countryCode);
         Task<List<TaxConfig>> FindAllAsync();
         Task SaveAsync(TaxConfig taxConfig);
@@ -25,6 +26,11 @@ namespace Dietary.Models
             _dbContext = dbContext;
             _taxConfigs = dbContext.TaxConfigs;
         }
+
+        public Task<TaxConfig> FindByIdAsync(long id)
+            => Query()
+                .SingleOrDefaultAsync(x => x.Id == id);
+
 
         public Task<TaxConfig> FindByCountryCodeAsync(string countryCode)
             => Query()

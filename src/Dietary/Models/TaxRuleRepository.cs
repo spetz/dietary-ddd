@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Dietary.DAL;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,6 +8,7 @@ namespace Dietary.Models
     public interface ITaxRuleRepository
     {
         Task<TaxRule> FindByIdAsync(long id);
+        Task<TaxRule> FindByTaxCodeContainingAsync(string taxCode);
         Task SaveAsync(TaxRule taxRule);
         Task DeleteAsync(TaxRule taxRule);
     }
@@ -23,10 +25,17 @@ namespace Dietary.Models
         }
 
         public Task<TaxRule> FindByIdAsync(long id)
+            => Query()
+                .SingleOrDefaultAsync(x => x.Id == id);
+
+        public Task<TaxRule> FindByTaxCodeContainingAsync(string taxCode)
+            => Query()
+                .SingleOrDefaultAsync(x => x.TaxCode == taxCode);
+
+        private IQueryable<TaxRule> Query()
             => _taxRules
                 .Include(x => x.TaxConfig)
-                .ThenInclude(x => x.TaxRules)
-                .SingleOrDefaultAsync(x => x.Id == id);
+                .ThenInclude(x => x.TaxRules);
 
         public Task SaveAsync(TaxRule taxRule) => _dbContext.UpsertAsync(taxRule);
 

@@ -12,6 +12,19 @@
         public int BSquareFactor { get; set; }
         public int CSquareFactor { get; set; }
         public long TaxConfigId { get; set; }
-        public TaxConfig TaxConfig { get; set; }
+        public TaxConfig TaxConfig { get;set; }
+
+        public static TaxRule LinearRule(int a, int b, string taxCode)
+        {
+            var taxRule = new TaxRule
+            {
+                IsLinear = true,
+                TaxCode = taxCode,
+                AFactor = a,
+                BFactor = b
+            };
+
+            return taxRule;
+        }
     }
 }
