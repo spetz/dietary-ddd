@@ -25,8 +25,6 @@ namespace Dietary.Tests.NewProducts
             Assert.Equal(11, p.GetCounter());
         }
 
-
-
         [Fact]
         public void cannotIncrementCounterIfPriceIsNotPositive()
         {

@@ -1,13 +1,19 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Dietary.Models.NewProducts
 {
     public class OldProduct
     {
+        [Key]
         public Guid SerialNumber { get; private set; } = Guid.NewGuid();
         private Price _price;
         private Description _desc;
         private Counter _counter;
+
+        private OldProduct()
+        {
+        }
 
         public OldProduct(decimal? price, string desc, string longDesc, int counter)
         {
@@ -40,7 +46,7 @@ namespace Dietary.Models.NewProducts
             }
         }
 
-        public void ChangePriceTo(decimal price)
+        public void ChangePriceTo(decimal? price)
         {
             if (_counter.HasAny())
             {
@@ -66,6 +72,10 @@ namespace Dietary.Models.NewProducts
 
         public static Price Of(decimal? value) => new Price(value);
 
+        private Price()
+        {
+        }
+        
         private Price(decimal? price)
         {
             if (price is null || price < 0)
@@ -83,10 +93,13 @@ namespace Dietary.Models.NewProducts
 
     public class Description
     {
-
         private readonly string _desc;
         private readonly string _longDesc;
 
+        private Description()
+        {
+        }
+        
         public Description(string desc, string longDesc)
         {
             _desc = desc ?? throw new InvalidOperationException("Cannot have a null description");
@@ -114,6 +127,10 @@ namespace Dietary.Models.NewProducts
 
         public static Counter Zero() => new Counter(0);
 
+        private Counter()
+        {
+        }
+        
         public Counter(int counter)
         {
             if (counter < 0)

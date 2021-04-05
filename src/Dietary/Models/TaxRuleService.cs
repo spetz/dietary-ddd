@@ -76,7 +76,7 @@ namespace Dietary.Models
         }
 
         public async Task AddTaxRuleToCountryAsync(string countryCode, int aFactor, int bFactor, int cFactor,
-            String taxCode)
+            string taxCode)
         {
             if (aFactor == 0)
             {

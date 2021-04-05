@@ -1,5 +1,7 @@
 using Dietary.DAL;
 using Dietary.Models;
+using Dietary.Models.Boundaries;
+using Dietary.Models.NewProducts;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -15,11 +17,14 @@ namespace Dietary
         {
             services
                 .AddScoped<CustomerService>()
+                .AddScoped<OldProductService>()
                 .AddScoped<OrderService>()
+                .AddScoped<PaymentService>()
                 .AddScoped<TaxRuleService>()
                 .AddScoped<IAuthenticationFacade, AuthenticationFacade>()
                 .AddScoped<ICustomerRepository, CustomerRepository>()
                 .AddScoped<ICustomerOrderGroupRepository, CustomerOrderGroupRepository>()
+                .AddScoped<IOldProductRepository, OldProductRepository>()
                 .AddScoped<IOrderRepository, OrderRepository>()
                 .AddScoped<ITaxConfigRepository, TaxConfigRepository>()
                 .AddScoped<ITaxRuleRepository, TaxRuleRepository>()

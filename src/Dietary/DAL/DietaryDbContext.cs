@@ -2,6 +2,7 @@ using System;
 using System.Reflection;
 using System.Threading.Tasks;
 using Dietary.Models;
+using Dietary.Models.NewProducts;
 using Microsoft.EntityFrameworkCore;
 
 namespace Dietary.DAL
@@ -14,6 +15,7 @@ namespace Dietary.DAL
 
         public DbSet<Customer> Customers { get; set; }
         public DbSet<CustomerOrderGroup> CustomerOrderGroups { get; set; }
+        public DbSet<OldProduct> OldProducts { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderLine> OrderLines { get; set; }
         public DbSet<Product> Products { get; set; }

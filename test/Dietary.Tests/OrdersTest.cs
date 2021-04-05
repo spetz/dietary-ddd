@@ -4,6 +4,7 @@ using System.Security.Principal;
 using System.Threading.Tasks;
 using Dietary.DAL;
 using Dietary.Models;
+using Dietary.Models.NewProducts;
 using NSubstitute;
 using Xunit;
 
@@ -56,15 +57,15 @@ namespace Dietary.Tests
 
             // kasia k$l
             var ludwik = await _customerService.GetIndividualOrdersForCustomerAsync(8);
-            Assert.Equal(0, ludwik.Count);
+            Assert.Empty(ludwik);
 
             // pawel Logistyk k$l
             var pawelLogistyk = await _customerService.GetIndividualOrdersForCustomerAsync(9);
-            Assert.Equal(0, pawelLogistyk.Count);
+            Assert.Empty(pawelLogistyk);
 
             // edward sprzedawca caterinx
             var edwardSprzedawca = await _customerService.GetIndividualOrdersForCustomerAsync(10);
-            Assert.Equal(1, edwardSprzedawca.Count);
+            Assert.Single(edwardSprzedawca);
         }
 
         [Fact]
@@ -90,6 +91,9 @@ namespace Dietary.Tests
         private readonly IOrderRepository _orderRepository;
         private readonly CustomerService _customerService;
         private readonly OrderService _orderService;
+
+        private readonly IOldProductRepository _oldProductRepository;
+        private readonly OldProductService _oldProductService;
 
         public OrdersTest()
         {
