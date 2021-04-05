@@ -15,7 +15,7 @@ namespace Dietary.Models.NewProducts
         
         public OldProductDescription(OldProduct oldProduct)
         {
-            Id = oldProduct.SerialNumber;
+            Id = oldProduct.Id;
             _oldProduct = oldProduct;
         }
 

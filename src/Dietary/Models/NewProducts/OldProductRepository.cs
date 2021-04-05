@@ -27,7 +27,7 @@ namespace Dietary.Models.NewProducts
 
         public Task<OldProduct> FindByIdAsync(Guid id)
             => _oldProducts
-                .SingleOrDefaultAsync(x => x.SerialNumber == id);
+                .SingleOrDefaultAsync(x => x.Id == id);
 
         public Task<List<OldProduct>> FindAllAsync() => _oldProducts.ToListAsync();
 

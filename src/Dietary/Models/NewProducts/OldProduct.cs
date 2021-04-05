@@ -10,7 +10,7 @@ namespace Dietary.Models.NewProducts
         private Counter _counter;
         
         [Key]
-        public Guid SerialNumber { get; private set; } = Guid.NewGuid();
+        public Guid Id { get; private set; } = Guid.NewGuid();
 
         private OldProduct()
         {
