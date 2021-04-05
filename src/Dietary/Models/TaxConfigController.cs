@@ -21,18 +21,18 @@ namespace Dietary.Models
             var map = new Dictionary<string, List<TaxRule>>();
             foreach (var tax in taxConfigs)
             {
-                if (!map.ContainsKey(tax.CountryCode))
+                if (!map.ContainsKey(tax.GetCountryCode()))
                 {
                     if (tax.TaxRules is null)
                     {
                         tax.TaxRules = new List<TaxRule>();
                     }
-
-                    map.Add(tax.CountryCode, tax.TaxRules);
+            
+                    map.Add(tax.CountryCode.AsString(), tax.TaxRules);
                 }
                 else
                 {
-                    map[tax.CountryCode].AddRange(tax.TaxRules);
+                    map[tax.GetCountryCode()].AddRange(tax.TaxRules);
                 }
             }
             

@@ -7,6 +7,10 @@
         private decimal? _extraLimit;
         public PayerId PayerId { get; private set; }
 
+        private Payer()
+        {
+        }
+
         public Payer(PayerId payerId, int age, decimal? availableLimit)
         {
             PayerId = payerId;
@@ -41,6 +45,10 @@
     {
         private readonly long _borrowerId;
 
+        private PayerId()
+        {
+        }
+        
         public PayerId(long borrowerId)
         {
             _borrowerId = borrowerId;

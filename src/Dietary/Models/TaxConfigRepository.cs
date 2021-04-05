@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Dietary.DAL;
@@ -10,7 +9,7 @@ namespace Dietary.Models
     public interface ITaxConfigRepository
     {
         Task<TaxConfig> FindByIdAsync(long id);
-        Task<TaxConfig> FindByCountryCodeAsync(string countryCode);
+        Task<TaxConfig> FindByCountryCodeAsync(CountryCode countryCode);
         Task<List<TaxConfig>> FindAllAsync();
         Task SaveAsync(TaxConfig taxConfig);
         Task DeleteAsync(TaxConfig taxConfig);
@@ -31,11 +30,9 @@ namespace Dietary.Models
             => Query()
                 .SingleOrDefaultAsync(x => x.Id == id);
 
-
-        public Task<TaxConfig> FindByCountryCodeAsync(string countryCode)
+        public Task<TaxConfig> FindByCountryCodeAsync(CountryCode countryCode)
             => Query()
-                .SingleOrDefaultAsync(x =>
-                    x.CountryCode.Equals(countryCode, StringComparison.InvariantCultureIgnoreCase));
+                .SingleOrDefaultAsync(x => x.CountryCode.Id.Equals(countryCode.Id));
 
         public Task<List<TaxConfig>> FindAllAsync()
             => Query().ToListAsync();

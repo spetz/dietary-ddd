@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Dietary.Models
@@ -20,40 +19,14 @@ namespace Dietary.Models
 
         public async Task AddTaxRuleToCountryAsync(string countryCode, int aFactor, int bFactor, string taxCode)
         {
-            if (string.IsNullOrWhiteSpace(countryCode) || countryCode.Length == 1)
-            {
-                throw new InvalidOperationException("Invalid country code");
-            }
-
-            if (aFactor == 0)
-            {
-                throw new InvalidOperationException("Invalid aFactor");
-            }
-
-            var taxRule = new TaxRule
-            {
-                AFactor = aFactor,
-                BFactor = bFactor,
-                IsLinear = true,
-                TaxCode = $"A. 899. {DateTime.UtcNow.Year}{taxCode}"
-            };
-            
-            var taxConfig = await _taxConfigRepository.FindByCountryCodeAsync(countryCode);
-            if (taxConfig is null)
-            {
+            var taxRule = TaxRule.LinearRule(aFactor, bFactor, taxCode);
+            var taxConfig = await _taxConfigRepository.FindByCountryCodeAsync(CountryCode.Of(countryCode));
+            if (taxConfig is null) {
                 taxConfig = await CreateTaxConfigWithRuleAsync(countryCode, taxRule);
                 return;
             }
 
-            if (taxConfig.MaxRulesCount <= taxConfig.TaxRules.Count)
-            {
-                throw new InvalidOperationException("Too many rules");
-            }
-            
-            taxConfig.TaxRules.Add(taxRule);
-            taxConfig.CurrentRulesCount += 1;
-            taxConfig.LastModifiedDate = DateTime.UtcNow;
-
+            taxConfig.Add(taxRule);
             var byOrderState = await _orderRepository.FindByOrderStateAsync(Order.OrderState.Initial);
 
             byOrderState.ForEach(async order =>
@@ -62,111 +35,38 @@ namespace Dietary.Models
                 {
                     order.TaxRules.Add(taxRule);
                     await _orderRepository.SaveAsync(order);
+                    await _taxRuleRepository.SaveAsync(taxRule);
                 }
             });
         }
 
         public async Task<TaxConfig> CreateTaxConfigWithRuleAsync(string countryCode, TaxRule taxRule)
         {
-            var taxConfig = new TaxConfig
-            {
-                CountryCode = countryCode,
-                TaxRules = new List<TaxRule>()
-            };
-            
-            taxConfig.TaxRules.Add(taxRule);
-            taxConfig.CurrentRulesCount = taxConfig.TaxRules.Count;
-            taxConfig.MaxRulesCount = 10;
-            taxConfig.LastModifiedDate = DateTime.UtcNow;
-            
-            if (string.IsNullOrWhiteSpace(countryCode) || countryCode.Length == 1)
-            {
-                throw new InvalidOperationException("Invalid country code");
-            }
-
+            var taxConfig = new TaxConfig(countryCode, 1, taxRule);
             await _taxConfigRepository.SaveAsync(taxConfig);
-            return taxConfig;
-        }
-        
-        public async Task<TaxConfig> CreateTaxConfigWithRuleAsync(string countryCode, int maxRulesCount, TaxRule taxRule)
-        {
-            var taxConfig = new TaxConfig
-            {
-                CountryCode = countryCode,
-                TaxRules = new List<TaxRule>()
-            };
-            
-            taxConfig.TaxRules.Add(taxRule);
-            taxConfig.CurrentRulesCount = taxConfig.TaxRules.Count;
-            taxConfig.MaxRulesCount = maxRulesCount;
-            taxConfig.LastModifiedDate = DateTime.UtcNow;
-            
-            if (string.IsNullOrWhiteSpace(countryCode) || countryCode.Length == 1)
-            {
-                throw new InvalidOperationException("Invalid country code");
-            }
-
-            await _taxConfigRepository.SaveAsync(taxConfig);
+            await _taxRuleRepository.SaveAsync(taxRule);
             return taxConfig;
         }
 
         public async Task AddTaxRuleToCountryAsync(string countryCode, int aFactor, int bFactor, int cFactor,
             string taxCode)
         {
-            if (aFactor == 0)
-            {
-                throw new InvalidOperationException("Invalid aFactor");
-            }
-
-            if (string.IsNullOrWhiteSpace(countryCode) || countryCode.Length == 1)
-            {
-                throw new InvalidOperationException("Invalid country code");
-            }
-
-            var taxRule = new TaxRule
-            {
-                ASquareFactor = aFactor,
-                BSquareFactor = bFactor,
-                CSquareFactor = cFactor,
-                IsSquare = true,
-                TaxCode = $"A. 899. {DateTime.UtcNow.Year}{taxCode}"
-            };
-            
-            var taxConfig = await _taxConfigRepository.FindByCountryCodeAsync(countryCode);
-            if (taxConfig is null)
-            {
+            var taxRule = TaxRule.SquareRule(aFactor, bFactor, cFactor, taxCode);
+            var taxConfig = await _taxConfigRepository.FindByCountryCodeAsync(CountryCode.Of(countryCode));
+            if (taxConfig is null) {
                 await CreateTaxConfigWithRuleAsync(countryCode, taxRule);
                 return;
             }
-            
-            taxConfig.TaxRules.Add(taxRule);
-            taxConfig.CurrentRulesCount += 1;
-            taxConfig.LastModifiedDate = DateTime.UtcNow;
+
+            taxConfig.Add(taxRule);
         }
 
         public async Task DeleteRuleAsync(long taxRuleId, long configId)
         {
             var taxRule = await _taxRuleRepository.FindByIdAsync(taxRuleId);
             var taxConfig = await _taxConfigRepository.FindByIdAsync(configId);
-            if (taxConfig.TaxRules.Contains(taxRule))
-            {
-                if (taxConfig.TaxRules.Count == 1)
-                {
-                    throw new InvalidOperationException("Last rule in country config");
-                }
-                
-                await _taxRuleRepository.DeleteAsync(taxRule);
-                taxConfig.TaxRules.Remove(taxRule);
-                taxConfig.CurrentRulesCount -= 1;
-                taxConfig.LastModifiedDate = DateTime.UtcNow;
-            }
+            taxConfig.Remove(taxRule);
         }
-
-        public async Task<List<TaxRule>> FindRulesAsync(string countryCode)
-            => (await _taxConfigRepository.FindByCountryCodeAsync(countryCode)).TaxRules;
-
-        public async Task<int> RulesCountAsync(string countryCode)
-            => (await _taxConfigRepository.FindByCountryCodeAsync(countryCode)).CurrentRulesCount;
         
         public Task<List<TaxConfig>> FindAllConfigsAsync() => _taxConfigRepository.FindAllAsync();
     }

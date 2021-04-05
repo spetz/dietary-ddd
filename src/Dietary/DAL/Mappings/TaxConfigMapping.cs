@@ -10,6 +10,8 @@ namespace Dietary.DAL.Mappings
         {
             builder.HasKey(x => x.Id);
             builder.HasMany(x => x.TaxRules);
+            builder.Property(x => x.CountryCode)
+                .HasConversion(x => x.AsString(), x => new CountryCode(x));
         }
     }
 }
