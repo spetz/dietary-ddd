@@ -8,19 +8,22 @@ namespace Dietary.Models.NewProducts
     public class OldProductService
     {
         private readonly IOldProductRepository _oldProductRepository;
+        private readonly IOldProductDescriptionRepository _oldProductDescriptionRepository;
 
-        public OldProductService(IOldProductRepository oldProductRepository)
+        public OldProductService(IOldProductRepository oldProductRepository,
+            IOldProductDescriptionRepository oldProductDescriptionRepository)
         {
             _oldProductRepository = oldProductRepository;
+            _oldProductDescriptionRepository = oldProductDescriptionRepository;
         }
 
         public async Task<List<string>> FindAllDescriptionsAsync()
-            => (await _oldProductRepository.FindAllAsync()).Select(x => x.FormatDesc()).ToList();
+            => (await _oldProductDescriptionRepository.FindAllAsync()).Select(x => x.FormatDesc()).ToList();
 
         public async Task ReplaceCharInDesc(Guid productId, char oldChar, char newChar)
         {
-            var product = await _oldProductRepository.FindByIdAsync(productId);
-            product.ReplaceCharFromDesc(oldChar, newChar);
+            var oldProductDescription = await _oldProductDescriptionRepository.FindByIdAsync(productId);
+            oldProductDescription.ReplaceCharFromDesc(oldChar, newChar);
         }
 
         public async Task IncrementCounterAsync(Guid productId)

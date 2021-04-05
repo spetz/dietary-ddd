@@ -12,7 +12,7 @@ namespace Dietary.Tests
         public TestDb()
         {
             DbContext = new DietaryDbContext(new DbContextOptionsBuilder<DietaryDbContext>()
-                .UseInMemoryDatabase("dietary").Options);
+                .UseInMemoryDatabase($"dietary-{Guid.NewGuid()}").Options);
 
             InitData();
         }

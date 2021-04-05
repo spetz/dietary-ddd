@@ -4,7 +4,6 @@ using System.Security.Principal;
 using System.Threading.Tasks;
 using Dietary.DAL;
 using Dietary.Models;
-using Dietary.Models.NewProducts;
 using NSubstitute;
 using Xunit;
 
@@ -91,9 +90,6 @@ namespace Dietary.Tests
         private readonly IOrderRepository _orderRepository;
         private readonly CustomerService _customerService;
         private readonly OrderService _orderService;
-
-        private readonly IOldProductRepository _oldProductRepository;
-        private readonly OldProductService _oldProductService;
 
         public OrdersTest()
         {

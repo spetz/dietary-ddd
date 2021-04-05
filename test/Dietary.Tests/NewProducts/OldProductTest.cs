@@ -83,33 +83,11 @@ namespace Dietary.Tests.NewProducts
             //then
             Assert.Equal(0, p.GetPrice());
         }
-        
-        [Fact]
-        public void canFormatDescription()
-        {
-            //expect
-            Assert.Equal("short *** long", ProductWithDesc("short", "long").FormatDesc());
-            Assert.Equal("", ProductWithDesc("short", "").FormatDesc());
-            Assert.Equal("", ProductWithDesc("", "long2").FormatDesc());
-        }
-        
-        [Fact]
-        public void canChangeCharInDescription()
-        {
-            //given
-            var oldProduct = ProductWithDesc("short", "long");
-        
-            //when
-            oldProduct.ReplaceCharFromDesc('s', 'z');
-        
-            //expect
-            Assert.Equal("zhort *** long", oldProduct.FormatDesc());
-        }
 
         private static OldProduct ProductWithPriceAndCounter(decimal? price, int counter)
             => new OldProduct(price, "desc", "longDesc", counter);
 
-        private static OldProduct ProductWithDesc(String desc, String longDesc)
+        private static OldProduct ProductWithDesc(string desc, string longDesc)
             => new OldProduct(10, desc, longDesc, 10);
     }
 }

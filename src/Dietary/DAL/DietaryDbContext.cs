@@ -16,6 +16,7 @@ namespace Dietary.DAL
         public DbSet<Customer> Customers { get; set; }
         public DbSet<CustomerOrderGroup> CustomerOrderGroups { get; set; }
         public DbSet<OldProduct> OldProducts { get; set; }
+        public DbSet<OldProductDescription> OldProductDescriptions { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderLine> OrderLines { get; set; }
         public DbSet<Product> Products { get; set; }

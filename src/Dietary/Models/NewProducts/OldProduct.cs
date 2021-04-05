@@ -5,11 +5,12 @@ namespace Dietary.Models.NewProducts
 {
     public class OldProduct
     {
-        [Key]
-        public Guid SerialNumber { get; private set; } = Guid.NewGuid();
         private Price _price;
         private Description _desc;
         private Counter _counter;
+        
+        [Key]
+        public Guid SerialNumber { get; private set; } = Guid.NewGuid();
 
         private OldProduct()
         {
@@ -54,11 +55,15 @@ namespace Dietary.Models.NewProducts
             }
         }
 
+        [Obsolete]
+        // not public
         public void ReplaceCharFromDesc(char charToReplace, char replaceWith)
         {
             _desc = _desc.Replace(charToReplace, replaceWith);
         }
 
+        [Obsolete]
+        // not public
         public string FormatDesc() => _desc.Formatted();
 
         public decimal GetPrice() => _price.GetAsDecimal();
