@@ -25,58 +25,84 @@ namespace Leave
                 throw new ArgumentException();
             }
 
-            Result result;
-            var employeeData = _database.FindByEmployeeId(employeeId);
-            var employeeStatus = (string) employeeData[0];
-            var daysSoFar = (int) employeeData[1];
+            var employee = _database.FindByEmployeeId(employeeId);
+            var result = employee.RequestDaysOff(days);
 
-            if (daysSoFar + days > 26)
+            if (result == Result.Manual)
             {
-                if (employeeStatus.Equals("PERFORMER") && daysSoFar + days < 45)
-                {
-                    result = Result.Manual;
-                    _escalationManager.NotifyNewPendingRequest(employeeId);
-                }
-                else
-                {
-                    result = Result.Denied;
-                    _emailSender.Send("next time");
-                }
+                _escalationManager.NotifyNewPendingRequest(employeeId);
             }
-            else
+
+            if (result == Result.Denied)
             {
-                if (employeeStatus.Equals("SLACKER"))
-                {
-                    result = Result.Denied;
-                    _emailSender.Send("next time");
-                }
-                else
-                {
-                    employeeData[1] = daysSoFar + days;
-                    result = Result.Approved;
-                    _database.Save(employeeData);
-                    _messageBus.SendEvent("request approved");
-                }
+                _emailSender.Send("next time");
+            }
+
+            if (result == Result.Approved)
+            {
+                _messageBus.SendEvent("request approved");
+                _database.Save(employee);
             }
 
             return result;
         }
     }
 
+    public class Employee
+    {
+        private long _employeeId;
+        private string _employeeStatus;
+        private int _daysSoFar;
+
+        public Employee(long employeeId, string employeeStatus, int daysSoFar)
+        {
+            _employeeId = employeeId;
+            _employeeStatus = employeeStatus;
+            _daysSoFar = daysSoFar;
+        }
+
+        public Result RequestDaysOff(int days)
+        {
+            if (_daysSoFar + days > 26)
+            {
+                if (_employeeStatus.Equals("PERFORMER") && _daysSoFar + days < 45)
+                {
+                    return Result.Manual;
+                }
+                else
+                {
+                    return Result.Denied;
+                }
+            }
+            else
+            {
+                if (_employeeStatus.Equals("SLACKER"))
+                {
+                    return Result.Denied;
+                }
+                else
+                {
+                    _daysSoFar = _daysSoFar + days;
+                    return Result.Approved;
+                }
+            }
+        }
+    }
+
     public interface ILeaveDatabase
     {
-        object[] FindByEmployeeId(long employeeId);
-        void Save(object[] employeeData);
+        Employee FindByEmployeeId(long employeeId);
+        void Save(Employee employeeData);
     }
 
     public class LeaveDatabase : ILeaveDatabase
     {
-        public object[] FindByEmployeeId(long employeeId)
+        public Employee FindByEmployeeId(long employeeId)
         {
-            return new object[0];
+            return null;
         }
 
-        public void Save(object[] employeeData)
+        public void Save(Employee employeeData)
         {
 
         }
